@@ -1,0 +1,194 @@
+# Project Name: Demacia Rising - Text Protocol (MVP)
+
+## 1. Technical Architecture & Stack
+For a web-based, logic-heavy prototype that needs to scale later:
+*   **Runtime:** Node.js (v20+)
+*   **Framework:** React (Latest) + TypeScript (Strict Mode). *React is chosen solely for state reactivity, even if the UI is just buttons.*
+*   **Build Tool:** Vite (Fastest localhost setup).
+*   **State Management:** **Zustand**. (Perfect for game loops, lighter than Redux, easier than Context).
+*   **Styling:** None / Native HTML (or Tailwind CSS just for layout structure, no "design").
+
+---
+
+## 2. Data Models (The "Database" of the Game)
+Before coding functions, we must define what the game *is*.
+
+### A. The Resources (Economy)
+The game tracks two types of currency: **Meta Currency** (from playing LoL) and **Game Currency** (produced by buildings).
+
+```typescript
+type Resources = {
+  // Meta Currency
+  silverShields: number; // The "Energy" to play turns
+
+  // Game Resources
+  food: number;      // Upkeep for units
+  wood: number;      // Basic building
+  stone: number;     // Advanced building
+  metal: number;     // Weapons/Armor
+  petricite: number; // Magic tech
+  valor: number;     // Research points
+}
+```
+
+### B. The Map (The Grid)
+Since we have no graphics, the "Map" is just an array of data objects.
+
+```typescript
+type TerrainType = 'PLAINS' | 'FOREST' | 'MOUNTAIN' | 'PETRICITE_GROVE';
+
+interface MapTile {
+  id: number;
+  name: string;             // e.g., "Sector 01" or "Zeffira"
+  terrain: TerrainType;
+  isOwned: boolean;         // True if player conquered it
+  building: Building | null;// What is built here?
+  enemyThreat: number;      // 0 = safe, >0 = enemy power level
+  garrison: number;         // ID of the army stationed here
+}
+```
+
+### C. The Units & Buildings
+```typescript
+interface Building {
+  type: 'FARM' | 'LUMBERMILL' | 'QUARRY' | 'BARRACKS' | 'TOWN_CENTER';
+  level: number;
+  production: Partial<Resources>; // e.g., { food: 10 }
+}
+
+interface Unit {
+  id: string;
+  type: 'SOLDIER' | 'RANGER' | 'CHAMPION';
+  name: string;
+  combatPower: number;
+  upkeepCost: number; // Food consumed per turn
+  locationTileId: number;
+  state: 'IDLE' | 'MOVING' | 'TRAINING';
+}
+```
+
+---
+
+## 3. Core Systems (The Logic)
+
+### System 1: The Meta-Game Loop (External Input)
+This system mocks the League of Legends client.
+*   **Action:** `SimulateLoLMatch(result: 'WIN' | 'LOSS')`
+*   **Logic:**
+    *   If WIN: Add 300 Silver Shields.
+    *   If LOSS: Add 150 Silver Shields.
+    *   *Constraint:* Cannot exceed Max Cap (e.g., 2000).
+
+### System 2: The Turn System (The Heartbeat)
+The game does not run in real-time. It runs in "Turns."
+*   **Action:** `EndTurn()`
+*   **Cost:** Deduct 10 Silver Shields. (If `< 10`, action fails).
+*   **Sequence of Events (The Algorithm):**
+    1.  **Validation:** Check if player has 10 Shields.
+    2.  **Consumption:** Deduct 10 Shields.
+    3.  **Production:** Iterate through all `MapTile`s. If `isOwned` AND has `building`, add `building.production` to `Resources`.
+    4.  **Upkeep:** Calculate total army size. Deduct `Unit.upkeepCost` from `Food`.
+        *   *Fail State:* If `Food < 0`, apply `Starvation` debuff (Units combat power -50%).
+    5.  **Training:** If a unit is in `TRAINING` state, reduce `turnsToTrain` by 1. If 0, set to `IDLE`.
+    6.  **Movement:** If a unit is `MOVING` to a tile, process arrival.
+    7.  **Threat Check:** Random chance (5%) for a `MapTile` to spawn an `enemyThreat`.
+    8.  **Increment Turn Counter:** `CurrentTurn + 1`.
+
+### System 3: Construction System
+*   **Action:** `ConstructBuilding(tileId, buildingType)`
+*   **Logic:**
+    *   Check if `MapTile.isOwned` is true.
+    *   Check if `MapTile.building` is null.
+    *   Check `Resources` against `BuildingCosts[buildingType]`.
+    *   Deduct Resources.
+    *   Set `MapTile.building = new Building(...)`.
+
+### System 4: Combat System (Auto-Battler)
+*   **Action:** `AttackTile(armyId, targetTileId)`
+*   **Logic:**
+    *   Get `Unit` stats (Player Power).
+    *   Get `targetTile.enemyThreat` (Enemy Power).
+    *   **Calculation:** `Result = PlayerPower - EnemyPower + (Random(-10 to +10))`.
+    *   **Win:**
+        *   Enemy threat removed.
+        *   `MapTile.isOwned` becomes `true`.
+        *   Gain `Valor`.
+    *   **Loss:**
+        *   Unit takes damage or dies.
+        *   Retreat to previous tile.
+
+---
+
+## 4. The Zero-UI Interface Plan
+This is how the screen will look. It is strictly functional.
+
+### Zone A: The Dashboard (Top)
+Just text displaying the state.
+```text
+[TURN: 45] | [SHIELDS: 150]
+FOOD: 500 (+20/turn) | WOOD: 200 (+10/turn) | STONE: 0 | METAL: 0
+NOTIFICATIONS: "Turn 44 ended. You gained 20 Food."
+```
+
+### Zone B: The Controls (Middle)
+These are the "Debug" buttons to drive the game.
+1.  **[MOCK: Win LoL Game]** -> Adds 300 Shields.
+2.  **[ACTION: End Turn (-10 Shields)]** -> Triggers the Turn Loop.
+
+### Zone C: The World List (Bottom)
+Since we have no map, we render the tiles as a list of rows.
+*   **Row 1:** `[ID: 1] [Name: Zeffira] [Owner: YOU] [Building: TOWN_CENTER] [Garrison: Poppy]`
+*   **Row 2:** `[ID: 2] [Name: North Field] [Owner: YOU] [Building: NONE] -> Button: [BUILD FARM (50 Wood)]`
+*   **Row 3:** `[ID: 3] [Name: Dark Forest] [Owner: ENEMY] [Threat: 50] -> Button: [ATTACK]`
+
+---
+
+## 5. Implementation Roadmap (For the Developer/AI)
+
+You can copy-paste these steps into your IDE/AI Chat to build it sequentially.
+
+### Step 1: Project Skeleton
+*   Initialize Vite + React + TS.
+*   Set up the `Zustand` store.
+*   Define the `Resources` and `MapTile` interfaces.
+
+### Step 2: The Resource & Turn Engine
+*   Implement `useGameStore`.
+*   Create the `endTurn` function inside the store.
+*   Make the "Dashboard" UI show dynamic numbers.
+*   Make the "End Turn" button work (numbers go up).
+
+### Step 3: The Map System
+*   Initialize the map with 5 tiles (1 Capital, 4 Wilderness).
+*   Create a component `<TileRow />` that takes data and renders a simple border div.
+*   Display the map list on screen.
+
+### Step 4: Building Logic
+*   Create a `const BUILDING_COSTS` object.
+*   Add a logic check: `if (money >= cost) buy()`.
+*   Update the UI to show "Farm" text inside the tile when bought.
+
+### Step 5: Unit & Combat (MVP)
+*   Allow "Training" a unit at the Town Center (costs Food).
+*   Allow clicking an Enemy Tile to compare Unit Power vs. Enemy Power.
+*   Resolve via `console.log` ("You Won!").
+
+---
+
+## 6. Prompt for the AI (Gemini/Copilot)
+
+If you are ready to code, copy this prompt into your editor's AI:
+
+> "I need to build the Core Logic for a browser-based strategy game using React, TypeScript, and Zustand.
+>
+> **The Goal:** A text-based kingdom builder (MVP). No assets, just buttons and logic.
+>
+> **Requirements:**
+> 1. Create a Zustand store called `useGameStore`.
+> 2. State must include: `resources` (food, wood, shields), `turn` (number), and `map` (array of Tile objects).
+> 3. Create an action `simulateLoLMatch()` that adds 'Shields'.
+> 4. Create an action `endTurn()` that costs 10 Shields, increments the turn, and adds resource production based on buildings.
+> 5. Create a React component `GameDashboard` to display resources and the `End Turn` button.
+> 6. Create a React component `MapList` that maps through the tile array and renders a simple `div` for each tile.
+>
+> Please generate the full `store.ts` and `App.tsx` code."
