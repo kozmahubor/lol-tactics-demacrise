@@ -6,7 +6,7 @@ export type Resources = {
   silverShields: number; // The "Energy" to play turns
 
   // Game Resources
-  food: number;      // Upkeep for units
+  food: number;      // Represents the total unit capacity.
   wood: number;      // Basic building
   stone: number;     // Advanced building
   metal: number;     // Weapons/Armor
@@ -23,7 +23,7 @@ export interface MapTile {
   isOwned: boolean;         // True if player conquered it
   building: Building | null;// What is built here?
   enemyThreat: number;      // 0 = safe, >0 = enemy power level
-  garrison: number | null;        // ID of the army stationed here
+  garrison: string | null;        // ID of the army stationed here
 }
 
 export interface Building {
@@ -41,4 +41,11 @@ export interface Unit {
   locationTileId: number;
   state: 'IDLE' | 'MOVING' | 'TRAINING';
   turnsToTrain?: number;
+  destinationTileId?: number;
+}
+
+export interface ScheduledAttack {
+  targetTileId: number;
+  attackTurn: number;
+  threatLevel: number;
 }

@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Setup: Project Initialization",
+    "description": "Initialize a new Vite project with React and TypeScript.",
+    "status": "Done",
+    "reason": "Project structure, package.json, and tsconfig files are present and correctly configured."
+  },
+  {
+    "name": "State Management: Zustand Setup",
+    "description": "Integrate Zustand for global state management.",
+    "status": "Done",
+    "reason": "The 'zustand' package is installed and useGameStore.ts is created."
+  },
+  {
+    "name": "Core Constants: Game Data",
+    "description": "Define all game constants for buildings (costs, production) and units (costs, training time, power, upkeep).",
+    "status": "Done",
+    "reason": "The src/constants/buildings.ts and src/constants/units.ts files are created and populated."
+  },
+  {
+    "name": "Game Logic: Meta-Game Loop",
+    "description": "Implement the simulateLoLMatch action in the Zustand store to add Silver Shields.",
+    "status": "Done",
+    "reason": "The 'simulateLoLMatch' action is implemented in useGameStore.ts."
+  },
+  {
+    "name": "Game Logic: Turn System",
+    "description": "Implement the endTurn action, including resource production, upkeep, unit training progress, and threat generation.",
+    "status": "Done",
+    "reason": "The 'endTurn' action is fully implemented in useGameStore.ts with all required sub-steps."
+  },
+  {
+    "name": "Game Logic: Construction System",
+    "description": "Implement the constructBuilding action to allow players to build on owned tiles, checking costs and deducting resources.",
+    "status": "Done",
+    "reason": "The 'constructBuilding' action is implemented in useGameStore.ts and integrated with the UI."
+  },
+  {
+    "name": "Game Logic: Unit Training System",
+    "description": "Implement the trainUnit action to create new units at appropriate buildings, checking costs.",
+    "status": "Done",
+    "reason": "The 'trainUnit' action is implemented in useGameStore.ts and integrated with the UI."
+  },
+  {
+    "name": "UI: Main Application Layout",
+    "description": "Create the main App.tsx component that lays out the dashboard and map.",
+    "status": "Done",
+    "reason": "App.tsx is created and renders GameDashboard and MapList."
+  },
+  {
+    "name": "UI: Game Dashboard",
+    "description": "Create the GameDashboard component to display resources, turn info, notifications, and game actions.",
+    "status": "Done",
+    "reason": "The GameDashboard.tsx component is implemented and correctly displays data from the Zustand store."
+  },
+  {
+    "name": "UI: World Map Display",
+    "description": "Create MapList.tsx and TileRow.tsx to display the game world as a list of tiles.",
+    "status": "Done",
+    "reason": "The components are implemented and render the map state."
+  },
+  {
+    "name": "UI: Building Interface",
+    "description": "In TileRow.tsx, add buttons to construct buildings on owned, empty tiles.",
+    "status": "Done",
+    "reason": "Buttons exist and correctly call the 'constructBuilding' action."
+  },
+  {
+    "name": "BUGFIX: Core Types Mismatch",
+    "description": "Correct the data type for `MapTile.garrison` to align with the `Unit.id` type.",
+    "status": "Not Done",
+    "reason": "The `garrison` property in `MapTile` is `number | null` but it should be `string | null` to store a unit's ID. This needs correction in `src/types/game.ts`."
+  },
+  {
+    "name": "BUGFIX: Combat Initiation Logic",
+    "description": "Fix the UI logic in `TileRow.tsx` that prevents the player from initiating an attack.",
+    "status": "Not Done",
+    "reason": "The current code incorrectly looks for attacking units on the target enemy tile, where they cannot exist. This makes the attack UI never appear. The logic needs to be changed to select from the player's available idle units on owned tiles."
+  },
+  {
+    "name": "REWORK: Food System as Unit Capacity",
+    "description": "Refactor the food system. Food should represent the maximum army size, not a consumable upkeep resource.",
+    "status": "Not Done",
+    "reason": "New requirement from `details.txt`. This involves changing the `endTurn` and `trainUnit` actions significantly."
+  },
+  {
+    "name": "FEATURE: Defensive Events",
+    "description": "Implement a system where player villages are attacked periodically, with a 5-turn warning.",
+    "status": "Not Done",
+    "reason": "New feature request. Requires adding state for scheduled events and new logic in the `endTurn` action."
+  },
+  {
+    "name": "FEATURE: Unit Movement",
+    "description": "Implement the ability for players to move units between their owned villages, with travel taking one turn.",
+    "status": "Not Done",
+    "reason": "New feature request. Requires a `moveUnit` action and new logic in the `endTurn` action to handle arrivals."
+  },
+  {
+    "name": "FEATURE: Village Purchase System (Raiding)",
+    "description": "Refine the system for conquering new villages by winning battles (Raiding).",
+    "status": "Not Done",
+    "reason": "The basic attack logic exists, but this task will track the refinement and alignment with the 'Raiding' concept from details.txt, which is blocked by the combat bugfixes."
+  }
+]

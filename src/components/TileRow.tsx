@@ -8,13 +8,16 @@ interface TileRowProps {
 }
 
 const TileRow: React.FC<TileRowProps> = ({ tile }) => {
-  const { constructBuilding, attackTile, trainUnit, units } = useGameStore();
+  const { constructBuilding, attackTile, trainUnit, moveUnit, units, map } = useGameStore();
 
   const [selectedUnitForAttack, setSelectedUnitForAttack] = React.useState<string | null>(null);
+  const [unitToMove, setUnitToMove] = React.useState<{ unitId: string, destinationId: number | null } | null>(null);
 
-  const availableUnitsForAttack = units.filter(unit =>
-    unit.state === 'IDLE' && unit.locationTileId === tile.id
-  );
+  // MVP Fix: Allow any idle unit to attack, regardless of location.
+  const availableUnitsForAttack = units.filter(unit => unit.state === 'IDLE');
+  const unitsOnThisTile = units.filter(unit => unit.locationTileId === tile.id);
+  const otherOwnedTiles = map.filter(m => m.isOwned && m.id !== tile.id);
+
 
   const handleBuild = (buildingType: Building['type']) => {
     constructBuilding(tile.id, buildingType);
@@ -25,19 +28,20 @@ const TileRow: React.FC<TileRowProps> = ({ tile }) => {
       attackTile(selectedUnitForAttack, tile.id);
       setSelectedUnitForAttack(null); // Reset selection after attack
     } else {
-      // If no specific unit selected, try to find one
-      const unitToAttackWith = units.find(unit => unit.state === 'IDLE' && unit.locationTileId === tile.id);
-      if (unitToAttackWith) {
-        attackTile(unitToAttackWith.id, tile.id);
-      } else {
-        alert('No idle units at this tile to attack with!');
-      }
+      alert('Please select a unit to attack with!');
     }
   };
 
   const handleTrain = (unitType: Unit['type']) => {
     trainUnit(tile.id, unitType);
   };
+
+  const handleConfirmMove = () => {
+    if(unitToMove && unitToMove.destinationId) {
+        moveUnit(unitToMove.unitId, unitToMove.destinationId);
+        setUnitToMove(null); // Reset after confirming
+    }
+  }
 
   return (
     <div style={{ border: '1px solid lightgray', padding: '8px', margin: '5px 0' }}>
@@ -51,24 +55,18 @@ const TileRow: React.FC<TileRowProps> = ({ tile }) => {
         tile.isOwned && <p>[Building: NONE]</p>
       )}
       {tile.enemyThreat > 0 && <p>[Threat: {tile.enemyThreat}]</p>}
-      {tile.garrison && <p>[Garrison: {tile.garrison}]</p>} {/* Placeholder for garrison name/ID */}
+      {tile.garrison && <p>[Garrison: {tile.garrison}]</p>}
 
       {/* Action Buttons */}
       <div style={{ marginTop: '5px' }}>
         {/* Build buttons */}
-        {!tile.building && tile.isOwned && tile.id !== 1 && ( // Can't build on capital (id:1) or if already built
+        {!tile.building && tile.isOwned && tile.id !== 1 && (
           <div style={{ marginBottom: '5px' }}>
             <button onClick={() => handleBuild('FARM')} style={{ marginRight: '5px' }}>
-              [BUILD FARM (50 Wood)]
+              [BUILD FARM]
             </button>
             <button onClick={() => handleBuild('LUMBERMILL')} style={{ marginRight: '5px' }}>
-              [BUILD LUMBERMILL (75 Wood)]
-            </button>
-            <button onClick={() => handleBuild('QUARRY')} style={{ marginRight: '5px' }}>
-              [BUILD QUARRY (100 Wood)]
-            </button>
-            <button onClick={() => handleBuild('BARRACKS')} style={{ marginRight: '5px' }}>
-              [BUILD BARRACKS (150 Wood, 50 Stone)]
+              [BUILD LUMBERMILL]
             </button>
           </div>
         )}
@@ -79,18 +77,12 @@ const TileRow: React.FC<TileRowProps> = ({ tile }) => {
             <button onClick={() => handleTrain('SOLDIER')} style={{ marginRight: '5px' }}>
               [TRAIN SOLDIER]
             </button>
-            <button onClick={() => handleTrain('RANGER')} style={{ marginRight: '5px' }}>
-              [TRAIN RANGER]
-            </button>
-            <button onClick={() => handleTrain('CHAMPION')} style={{ marginRight: '5px' }}>
-              [TRAIN CHAMPION]
-            </button>
           </div>
         )}
 
         {/* Attack button */}
         {!tile.isOwned && tile.enemyThreat > 0 && availableUnitsForAttack.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
             <select
               onChange={(e) => setSelectedUnitForAttack(e.target.value)}
               value={selectedUnitForAttack || ''}
@@ -99,25 +91,48 @@ const TileRow: React.FC<TileRowProps> = ({ tile }) => {
               <option value="">Select Unit to Attack</option>
               {availableUnitsForAttack.map(unit => (
                 <option key={unit.id} value={unit.id}>
-                  {unit.name} (Power: {unit.combatPower})
+                  {unit.name} @ {map.find(t=>t.id === unit.locationTileId)?.name} (Pwr: {unit.combatPower})
                 </option>
               ))}
             </select>
             <button onClick={handleAttack} disabled={!selectedUnitForAttack}>
-              [ATTACK with {selectedUnitForAttack ? units.find(u => u.id === selectedUnitForAttack)?.name : 'Selected Unit'}]
+              [ATTACK]
             </button>
           </div>
         )}
       </div>
+
       {/* Display Units at this tile */}
-      {tile.isOwned && units.filter(unit => unit.locationTileId === tile.id).length > 0 && (
+      {tile.isOwned && unitsOnThisTile.length > 0 && (
         <div style={{ marginTop: '10px', borderTop: '1px dotted lightgray', paddingTop: '5px' }}>
           <strong>Units at {tile.name}:</strong>
           <ul>
-            {units.filter(unit => unit.locationTileId === tile.id).map(unit => (
-              <li key={unit.id}>
-                {unit.name} ({unit.type}) - Power: {unit.combatPower} - State: {unit.state}
-                {unit.state === 'TRAINING' && unit.turnsToTrain !== undefined && ` (${unit.turnsToTrain} turns left)`}
+            {unitsOnThisTile.map(unit => (
+              <li key={unit.id} style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                <span>
+                    {unit.name} ({unit.type}) - Pwr: {unit.combatPower} - State: {unit.state}
+                    {unit.state === 'TRAINING' && unit.turnsToTrain !== undefined && ` (${unit.turnsToTrain} turns left)`}
+                </span>
+
+                {/* Move UI */}
+                {unit.state === 'IDLE' && otherOwnedTiles.length > 0 && (
+                    unitToMove?.unitId === unit.id ? (
+                        <>
+                            <select 
+                                onChange={e => setUnitToMove({ ...unitToMove, destinationId: Number(e.target.value)})}
+                                value={unitToMove.destinationId || ''}
+                            >
+                                <option value="">Select Destination</option>
+                                {otherOwnedTiles.map(dest => <option key={dest.id} value={dest.id}>{dest.name}</option>)}
+                            </select>
+                            <button onClick={handleConfirmMove} disabled={!unitToMove.destinationId}>Confirm Move</button>
+                            <button onClick={() => setUnitToMove(null)}>Cancel</button>
+                        </>
+                    ) : (
+                        <button onClick={() => setUnitToMove({ unitId: unit.id, destinationId: null })}>Move</button>
+                    )
+                )}
+
               </li>
             ))}
           </ul>

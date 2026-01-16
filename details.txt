@@ -1,0 +1,100 @@
+# **DEMACIA RISING: THE COMPLETE GUIDE**
+**Game Type:** Turn-Based Strategy / City-Builder
+**Platform:** League of Legends Client (PC)
+**Availability:** January 9, 2026 – March 4, 2026
+**Current Patch:** V26.01 (Act I: The Founding of Demacia)
+
+## **1. OVERVIEW & LORE**
+**Demacia Rising** is a client-exclusive minigame where players relive the founding of the kingdom of Demacia. Set in the aftermath of the Rune Wars, you guide desperate refugees to the petricite forests west of Valoran to build a sanctuary against magic.
+
+*   **Narrative:** The story is framed as **Tianna Crownguard** teaching **Lux** about military history.
+*   **Main Hub:** The capital city you are building is **Zeffira**.
+*   **Acts:**
+    *   *Act I:* The Founding of Demacia (Available now).
+    *   *Act II:* Treats from Beyond (Coming soon).
+
+---
+
+## **2. THE CORE LOOP & LOGIC**
+The game operates on a strictly **Turn-Based System** linked to your activity in the main *League of Legends* game.
+
+### **The "Silver Shield" Economy (Time/Energy System)**
+To play the game, you need **Silver Shields**.
+*   **Earning Shields:** You earn **150 Shields** for every 60 minutes of LoL or TFT played (300 if you own the Pass).
+*   **Spending Shields:** Ending a turn costs **10 Silver Shields**.
+*   **Logic:** You play LoL to earn "time" to progress your Demacian city.
+
+### **The Turn Sequence**
+When you click "End Turn" (Sun Icon), the following logic executes in order:
+1.  **Production:** All resource buildings generate their specific yield.
+2.  **Construction:** Buildings under construction progress by 1 turn.
+3.  **Movement:** Units on the map move closer to their destination.
+4.  **Training:** Units in Barracks progress their training timer.
+5.  **Events:** World Events or Combat Threats are triggered.
+
+*Tip: You can use the "Undo" button (circular arrow) to reset actions taken in the *current* turn before you finalize it.*
+
+---
+
+## **3. RESOURCES & MANAGEMENT**
+You must balance multiple currencies to expand. Production is viewed in the top status bar.
+
+| Resource | Source | Usage |
+| :--- | :--- | :--- |
+| **Food** | Farms | Increases **Army Size Cap**. Each unit consumes 1 Food slot permanently. |
+| **Lumber** | Lumberyards | Building structures, repairing, and training basic units (Archers/Guards). |
+| **Stone** | Quarries | Upgrading buildings and training mid-tier units. |
+| **Metal** | Forges | High-tier structures and heavy units. |
+| **Petricite** | Petricite Mills | High-tier research and elite units. |
+| **Valor** | Victories/Expansion | **Research Currency**. Earned by settling towns, winning battles, and events. |
+| **Silver Shields** | LoL Gameplay | Ending turns (10 cost) and researching Kingdom Upgrades. |
+
+**Strategic Logic:**
+*   **Town Environments:** Certain locations grant bonuses. E.g., placing a Farm in a "Heartland Town" yields extra food.
+*   **Demolition:** You can destroy buildings if you need the slot for a different resource, though this wastes the turns spent building it.
+
+---
+
+## **4. STRUCTURES**
+Most structures require unlocking via the **Blue Research Tree**.
+
+*   **Barracks:** (300 Lumber, 150 Stone) – Trains units.
+*   **Lumberyard:** (Default) – Produces Lumber (15/30/75 per turn based on level).
+*   **Farm:** (Default) – Grants Food Slots (1/2/3 slots based on level).
+*   **Quarry:** (100 Lumber) – Produces Stone (10/20/50 per turn).
+*   **Forge:** (100 Lumber, 75 Stone) – Produces Metal (5/10/25 per turn).
+*   **Quartermaster:** (250 Shields, 3 Valor, 100 Stone) – **Combat Buff:** Units in this settlement or neighbors deal +25% Damage.
+
+---
+
+## **5. UNITS & COMBAT**
+Combat is **Auto-Play**. You must prepare your army *before* the fight starts.
+
+### **Unit Types**
+*   **Guard:** (Melee) Cheap, spear-wielders. *Cost: 1 Food, 50 Lumber.*
+*   **Archer:** (Ranged) High damage, low health. *Cost: 1 Food, 75 Lumber.*
+*   **Soldier:** (Tank) Shield-bearers, front-line blockers. *Cost: 1 Food, 70 Stone, 50 Metal.*
+*   **Champions:** Unique Hero units unlocked via **Gold Research**.
+
+### **Champion Availability**
+*   **Poppy:** Unlocked after Prologue. (Stuns enemies).
+*   **Morgana:** Unlocked in Chapter 2 (Zeffira Lvl 2). (AoE Damage/Tormented Soil).
+*   **Kayle & Galio:** Unlocked in Chapters 3 & 4.
+
+### **Combat Mechanics**
+1.  **Deployment:** Units take time to travel between settlements. Plan ahead.
+2.  **Raiding:** You click an enemy territory to scout their power. If you win, you claim the land.
+3.  **Defending:** Random events will send enemies to attack *your* settlements. You must move units there before the turn timer expires.
+4.  **Stats:** Units have specific counters (e.g., Shields block Archers). Research upgrades increase "Platoon Size" (number of soldiers in one unit) or raw stats.
+
+---
+
+## **6. THE RESEARCH TREE**
+Research is the primary progression system, accessed via the bottom-right panel. It is gated by the **Level of Zeffira** (your main city).
+
+*   **<span style="color:green">GREEN (System):</span>** Meta-rewards. Tracks Pass ownership and external bonuses.
+*   **<span style="color:blue">BLUE (Kingdom):</span>** Economy efficiency. Unlocks new buildings (Quarry/Forge) and boosts resource yields.
+*   **<span style="color:red">RED (Combat):</span>** Military might. Unlocks new units (Archers/Soldiers) and stat buffs.
+*   **<span style="color:gold">GOLD (Champions):</span>** Unlocks Hero units. *Note: Champions must still be trained at a Barracks after unlocking.*
+
+**Chain Logic:** Research is linear. You must unlock "Increase Platoon Size I" to unlock "Piercing Strikes."

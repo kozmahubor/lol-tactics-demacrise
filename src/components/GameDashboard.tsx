@@ -3,7 +3,7 @@ import React from 'react';
 import { useGameStore } from '../store/useGameStore';
 
 const GameDashboard: React.FC = () => {
-  const { resources, turn, notifications, simulateLoLMatch, endTurn } = useGameStore();
+  const { resources, turn, notifications, units, simulateLoLMatch, endTurn } = useGameStore();
 
   return (
     <div style={{ border: '1px solid gray', padding: '10px', marginBottom: '20px' }}>
@@ -11,7 +11,7 @@ const GameDashboard: React.FC = () => {
       <div style={{ marginBottom: '10px' }}>
         <p><strong>[TURN: {turn}]</strong> | <strong>[SHIELDS: {resources.silverShields}]</strong></p>
         <p>
-          FOOD: {resources.food} | WOOD: {resources.wood} | STONE: {resources.stone} | METAL: {resources.metal} | PETRICITE: {resources.petricite} | VALOR: {resources.valor}
+          <strong>ARMY: {units.length} / {resources.food}</strong> | WOOD: {resources.wood} | STONE: {resources.stone} | METAL: {resources.metal} | PETRICITE: {resources.petricite} | VALOR: {resources.valor}
         </p>
         <div style={{ borderTop: '1px solid lightgray', paddingTop: '5px', marginTop: '5px' }}>
           <strong>NOTIFICATIONS:</strong>
