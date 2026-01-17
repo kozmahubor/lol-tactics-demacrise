@@ -2,12 +2,9 @@
 // src/store/useGameStore.ts
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Resources, MapTile, Building, Unit, ScheduledAttack } from '../types/game';
 import { BUILDING_COSTS, BUILDING_PRODUCTION } from '../constants/buildings';
 import { UNIT_COSTS, UNIT_TRAINING_TIME, UNIT_BASE_POWER, UNIT_UPKEEP } from '../constants/units';
-import { writeTextFile, BaseDirectory } from '@tauri-apps/api/fs';
-
 
 interface GameState {
   resources: Resources;
@@ -97,16 +94,6 @@ const initialNotifications: string[] = [];
 const initialScheduledAttacks: ScheduledAttack[] = [];
 
 type GameStore = GameState & GameActions;
-
-// Helper function to append to the log file
-const appendToLog = async (content: string) => {
-  // This is a placeholder for file system interaction.
-  // In a real Tauri/Electron app, you'd use the fs API.
-  console.log("--- LOG ---\n" + content + "\n--- END LOG ---");
-  // Example for Tauri:
-  // await writeTextFile('turn_log.txt', content, { dir: BaseDirectory.App, append: true });
-};
-
 
 export const useGameStore = create<GameStore>((set, get) => ({
   resources: initialResources,
